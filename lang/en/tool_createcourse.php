@@ -36,3 +36,8 @@ $string['dbauth_password_name'] = 'dbauth_password';
 $string['dbauth_password_visiblename'] = 'Password';
 $string['dbauth_password_description'] = 'Enter database password here.';
 $string['dbauth_password_default'] = '';
+
+//index form elements
+$string['idx_termcode_txt'] = 'Termcode';
+$string['idx_courseid_txt'] = 'Course Id';
+$string['idx_suffix_txt'] = 'Suffix';
