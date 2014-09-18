@@ -31,6 +31,10 @@ admin_externalpage_setup('tool_createcourse_create');
 //}
 
 $createcourseform = new createcourse_form();
+$renderer = $PAGE->get_renderer('tool_createcourse');
+$data = $createcourseform->get_data();
+
+echo $renderer->index_page($createcourseform);
 
 
 if($createcourseform->is_cancelled()) {
@@ -41,7 +45,6 @@ if($createcourseform->is_cancelled()) {
     //$toform;
     //$createcourseform->set_data($toform);
     
-    $createcourseform->display();
 }
 
 

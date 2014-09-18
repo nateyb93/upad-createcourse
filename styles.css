@@ -1,4 +1,16 @@
-.textbox {
-    color: #00ff00;
-    width: 1000px;
+.fitem.fitem_ftext{
+    color:#000000;
+    display:block;
+    float:left;
+    width:100px !important;
 }
+
+.fitemtitle{
+    width:auto !important;
+}
+
+.text{
+    float:left;
+    margin-left:0px;
+}
+
