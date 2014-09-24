@@ -44,9 +44,19 @@ if($hassiteconfig) {
                                                 get_string('dbauth_login_default', 'tool_createcourse')));
     
     $settings->add(new admin_setting_configpasswordunmask(get_string('dbauth_password_name', 'tool_createcourse'),
-                                                get_string('dbauth_password_visiblename', 'tool_createcourse'),
-                                                get_string('dbauth_password_description', 'tool_createcourse'),
-                                                get_string('dbauth_password_default', 'tool_createcourse')));
+                                                          get_string('dbauth_password_visiblename', 'tool_createcourse'),
+                                                          get_string('dbauth_password_description', 'tool_createcourse'),
+                                                          get_string('dbauth_password_default', 'tool_createcourse')));
+    
+    
+    $settings->add(new admin_setting_heading(get_string('importsettings_heading_name', 'tool_createcourse'),
+                                             get_string('importsettings_heading_heading', 'tool_createcourse'),
+                                             get_string('importsettings_heading_info', 'tool_createcourse')));
+    
+    $settings->add(new admin_setting_configtext(get_string('importsettings_maxcourses_name', 'tool_createcourse'),
+                                                get_string('importsettings_maxcourses_visiblename', 'tool_createcourse'),
+                                                get_string('importsettings_maxcourses_description', 'tool_createcourse'),
+                                                get_string('importsettings_maxcourses_default', 'tool_createcourse')));
     
     $ADMIN->add('tools', $settings);
 }

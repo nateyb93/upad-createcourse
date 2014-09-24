@@ -10,6 +10,7 @@ require_login();
 
 
 require_once __DIR__ . '/createcourse_form.php';
+require_once __DIR__ . '/bannerimport_form.php';
 
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
@@ -18,6 +19,7 @@ require_once($CFG->libdir . '/blocklib.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/accesslib.php');
 require_once($CFG->libdir . '/weblib.php');
+require_once(__DIR__ . 'class_import.php');
 
 admin_externalpage_setup('tool_createcourse_create');
 //
@@ -34,16 +36,16 @@ $createcourseform = new createcourse_form();
 $renderer = $PAGE->get_renderer('tool_createcourse');
 $data = $createcourseform->get_data();
 
-echo $renderer->index_page($createcourseform);
+
 
 
 if($createcourseform->is_cancelled()) {
     //handle form cancel operation
-} else if($fromform = $createcourseform->get_data()) {
-    //in this case you process validated data. $mform->get_data() returns data posted in form.
+} else if($postData = $createcourseform->get_data()) {
+    //handle data submitted with form
+    
 } else {
-    //$toform;
-    //$createcourseform->set_data($toform);
+    echo $renderer->index_page($createcourseform);
     
 }
 

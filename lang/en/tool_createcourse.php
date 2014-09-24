@@ -37,7 +37,29 @@ $string['dbauth_password_visiblename'] = 'Password';
 $string['dbauth_password_description'] = 'Enter database password here.';
 $string['dbauth_password_default'] = '';
 
-//index form elements
+//banner import settings
+$string['importsettings_heading_name'] = 'importsettings_heading';
+$string['importsettings_heading_heading'] = 'Import settings';
+$string['importsettings_heading_info'] = 'Settings for banner database imports';
+
+$string['importsettings_maxcourses_name'] = 'importsettings_maxcourses';
+$string['importsettings_maxcourses_visiblename'] = 'Max # of courses';
+$string['importsettings_maxcourses_description'] = "Sets the maxiumum number of courses that can be imported at a time";
+$string['importsettings_maxcourses_default'] = '';
+
+//course table column names
+$string['col_termcode'] = 'Termcode';
+$string['col_suffix'] = 'Suffix';
+$string['col_categoryid'] = 'Category ID';
+$string['col_actions'] = 'Actions';
+
+//main page/new courses finding form elements
 $string['idx_termcode_txt'] = 'Termcode';
-$string['idx_courseid_txt'] = 'Course Id';
+$string['idx_categoryid_txt'] = 'Category Id';
 $string['idx_suffix_txt'] = 'Suffix';
+
+$string['idx_submit_btn'] = 'Submit';
+$string['idx_header'] = "Category information";
+
+$string['idx_description'] = '';
+$string['addcourse_description'] = "Enter information here for a new category. If it isn't already in the database, it will be added.";

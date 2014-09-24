@@ -11,7 +11,12 @@ require_once( "$CFG->libdir/blocklib.php" );
 require_once( "$CFG->libdir/pagelib.php" );
 
 
-
+/**
+ * Retrives database information for the banner database containing course information
+ * MAKE SURE YOU CHECK FOR NULL WHEN USING
+ * @global type $DB
+ * @return type
+ */
 function get_db_info()
 {
     global $DB;
@@ -25,8 +30,15 @@ function get_db_info()
     $banner_protocol = $records(0)->value;
     $banner_hostname = $records(1)->value;
     $banner_portno = $records(2)->value;
+    
+    if($banner_protocol == null || $banner_hostname == null || $banner_portno == null) {
+        die("Please provide valid database information by visiting the settings page for this plugin.\n");
+
+    }
+    
     $banner_username = $records(3)->value;
     $banner_password = $records(4)->value;
+    $banner_maxcourses = $records(5)->value;
     $banner_db = "(DESCRIPTION =
             (ADDRESS =
                 (PROTOCOL = $banner_protocol)
@@ -39,8 +51,8 @@ function get_db_info()
     $db_connect_info = array(
         'db' => $banner_db,
         'username' => $banner_username,
-        'password' => $banner_password
-        
+        'password' => $banner_password,
+        'maxcourses' => $banner_maxcourses
     );
     
     return $db_connect_info;
