@@ -27,15 +27,16 @@ class createcourse_form extends moodleform {
         
         $this->addSpacer($mform);
         
+        $mform->addElement('text', 'suffix', get_string('idx_suffix_txt', 'tool_createcourse'));
+        $mform->setType('suffix', PARAM_NOTAGS);
+        $mform->setDefault('suffix', '');
+        
+        $this->addSpacer($mform);
+        
         $mform->addElement('text', 'categoryid', get_string('idx_categoryid_txt', 'tool_createcourse'));
         $mform->setType('categoryid', PARAM_NOTAGS);
         $mform->setDefault('categoryid', '');
         
-        $this->addSpacer($mform);
-        
-        $mform->addElement('text', 'suffix', get_string('idx_suffix_txt', 'tool_createcourse'));
-        $mform->setType('suffix', PARAM_NOTAGS);
-        $mform->setDefault('suffix', '');
         
         //adds the submit, reset, and cancel buttons to the form
         $buttonarray = array();

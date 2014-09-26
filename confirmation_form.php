@@ -3,14 +3,11 @@
  * bannerimport_form.php defines a form that is shown when a selection of courses has been imported from the banner database within UP's course system.
  * 
  */
-class bannerimportform extends moodleform {
+class confirmationform extends moodleform {
     
-    protected $tableimport;
-    
-    public function __construct($tableimport)
+    public function __construct()
     {
         //set the data for this form
-        $this->tableimport = $tableimport;
         parent::__construt();
     }
     
@@ -19,8 +16,9 @@ class bannerimportform extends moodleform {
         
         //header
         $mform->addElement('header', 'importcourses', get_string('createcoursestable_legend', 'tool_createcourse'));
+        $mform->addElement('button', 'confirmimport', "Confirm");
         
-        //table content
-        $mform->addElement('static', 'importcourseslist', '', html_writer::table($this->tableimport));
+        
+       
     }
 }
