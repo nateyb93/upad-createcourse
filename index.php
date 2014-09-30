@@ -11,6 +11,7 @@ require_login();
 
 require_once __DIR__ . '/createcourse_form.php';
 require_once __DIR__ . '/confirmation_form.php';
+require_once __DIR__ . '/success_form.php';
 
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
@@ -35,8 +36,7 @@ admin_externalpage_setup('tool_createcourse_create');
 $createcourseform = new createcourse_form();
 $renderer = $PAGE->get_renderer('tool_createcourse');
 $data = $createcourseform->get_data();
-
-
+//$SESSION->currentpage = $renderer::INDEX_PAGE_IMPORT_STEP;
 
 
 if($createcourseform->is_cancelled()) {
@@ -51,21 +51,36 @@ if($createcourseform->is_cancelled()) {
             'suffix' => $postData->suffix,
             'category_id' => $postData->categoryid
         );
-        $_SESSION['term_data'] = $term_data;
-        $_SESSION['courses'] = array();
+        $SESSION->term_data = $term_data;
+        $SESSION->courses = array();
         
-        $courses = up_import_courses();
+        $SESSION->imports = up_import_courses();
         
         $confirmationform = new confirmationform();
-        echo $renderer->index_page($confirmationform, $renderer::INDEX_PAGE_CONFIRMATION_STEP);
+        
+        $step = (!empty($SESSION->courses)) ? $renderer::INDEX_PAGE_CONFIRMATION_STEP : $renderer::INDEX_PAGE_IMPORT_STEP;
+        $SESSION->currentpage = $renderer::INDEX_PAGE_CONFIRMATION_STEP;
+        echo $renderer->index_page($confirmationform, $step);
+        
         
     }
     //handle data submitted with form
     
-} else {
-    echo $renderer->index_page($createcourseform, $renderer::INDEX_PAGE_IMPORT_STEP);
+} else if($SESSION->currentpage == $renderer::INDEX_PAGE_CONFIRMATION_STEP) {
+    $imports = $SESSION->imports;
+    up_build_courses($imports);
+    up_insert_courses();
+    
+    $step = $renderer::INDEX_PAGE_SUCCESS_STEP;
+    $SESSION->currentpage = $step;
+    $successform = new successform();
+    echo $renderer->index_page($successform, $step);
+}
+else{
+    $step = $renderer::INDEX_PAGE_IMPORT_STEP;
+    $SESSION->currentpage = $step;
+    echo $renderer->index_page($createcourseform, $step);
     
 }
-
 
 ?>

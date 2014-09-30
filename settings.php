@@ -48,6 +48,11 @@ if($hassiteconfig) {
                                                           get_string('dbauth_password_description', 'tool_createcourse'),
                                                           get_string('dbauth_password_default', 'tool_createcourse')));
     
+    $settings->add(new admin_setting_configtext(get_string('dbauth_sid_name', 'tool_createcourse'),
+                                                get_string('dbauth_sid_visiblename', 'tool_createcourse'),
+                                                get_string('dbauth_sid_description', 'tool_createcourse'),
+                                                get_string('dbauth_sid_default', 'tool_createcourse')));
+    
     
     $settings->add(new admin_setting_heading(get_string('importsettings_heading_name', 'tool_createcourse'),
                                              get_string('importsettings_heading_heading', 'tool_createcourse'),

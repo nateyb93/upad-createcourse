@@ -8,17 +8,20 @@ class confirmationform extends moodleform {
     public function __construct()
     {
         //set the data for this form
-        parent::__construt();
+        parent::__construct();
     }
     
     public function definition() {
         $mform =& $this->_form;
         
         //header
-        $mform->addElement('header', 'importcourses', get_string('createcoursestable_legend', 'tool_createcourse'));
-        $mform->addElement('button', 'confirmimport', "Confirm");
+        $mform->addElement('header', 'importcourses', get_string('confirmationpage_header', 'tool_createcourse'));
+        $mform->addElement('html', '<span>' . get_string('confirmationpage_text','tool_createcourse') . '</span>');
         
-        
-       
+        $buttonarray = array();
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('confirmationpage_submit', 'tool_createcourse'));
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->closeHeaderBefore('buttonar');
+
     }
 }

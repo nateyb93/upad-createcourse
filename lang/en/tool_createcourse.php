@@ -37,6 +37,11 @@ $string['dbauth_password_visiblename'] = 'Password';
 $string['dbauth_password_description'] = 'Enter database password here.';
 $string['dbauth_password_default'] = '';
 
+$string['dbauth_sid_name'] = 'dbauth_sid';
+$string['dbauth_sid_visiblename'] = 'Site Identifier';
+$string['dbauth_sid_description'] = 'Enter valid SID here.';
+$string['dbauth_sid_default'] = '';
+
 //banner import settings
 $string['importsettings_heading_name'] = 'importsettings_heading';
 $string['importsettings_heading_heading'] = 'Import settings';
@@ -63,3 +68,12 @@ $string['idx_header'] = "Category information";
 
 $string['idx_description'] = '';
 $string['addcourse_description'] = "Enter information here for a new category. If it isn't already in the database, it will be added.";
+
+$string['confirmationpage_header'] = 'Confirm Submission';
+$string['confirmationpage_text'] = 'Are you sure you wish to insert these courses?';
+$string['confirmationpage_submit'] = 'Submit';
+
+
+$string['successpage_text'] = "Success! The classes with the specified termcode have been added to Moodle's course database.";
+$string['successpage_submit'] = "Continue";
+
