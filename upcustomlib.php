@@ -1,5 +1,10 @@
 <?php 
+/**
+ * upcustomlib.php defines custom functions to use for inserting imported courses into moodle's database
+ * 
+ */
 
+/* initialization stuff */
 defined('MOODLE_INTERNAL') || die ;
 require_once("$CFG->libdir/externallib.php");
 
@@ -19,21 +24,17 @@ require_once( __DIR__ . '/timer.php' );
 
 //   define('CLI_SCRIPT', true);
 
-
-// Create counters for successfully and unsuccessfully created courses
-$courses_created = 0;
-$courses_failed = 0;
-
 set_time_limit( 3600 );
 define( 'UP_DEBUG', true );
 
-
-// Call moodle path
-$moodlepath = '/var/www/html/moodle';
-
-
 // Load libs
+// Call moodle path
+// TODO: figure out if this is needed; doesn't seem to do anything at the moment.
+//$moodlepath = '/var/www/html/moodle';
 //require_once( $moodlepath . '/config.php' );
+
+/* end initialization stuff */
+
 
 /**
  * Retrives database information for the banner database containing course information
@@ -99,6 +100,7 @@ function get_db_info()
     }
 }
 
+
 /**
  * Gets all course information from the current semester's termcode from the banner database
  * @return type array
@@ -127,6 +129,7 @@ function up_import_courses()
     
     return $results;
 }
+
 
 /**
  * Creates a course using the provided information
@@ -212,6 +215,11 @@ function up_build_course( $courserequestnumber, $shortname, $fullname, $startdat
 
  } // end of function build_course //
  
+ 
+ /**
+  * Cycles through list of imported courses and builds them for insertion into moodle's database.
+  * @param type $courses array containing course information from banner database
+  */
  function up_build_courses($courses)
  {
      foreach($courses as $course)
@@ -422,7 +430,6 @@ function up_insert_courses(){
      // end foreach( $results as $data ) //
 
     echo '<br />action took: ' . $ts_timer->getTime() . " seconds.<br />" . "<br /> Courses created: " . $courses_created . " | Courses failed: " . $courses_failed;
+    $SESSION->courses = array();
 }
-
-
 ?>

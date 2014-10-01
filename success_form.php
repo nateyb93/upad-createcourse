@@ -1,4 +1,7 @@
 <?php
+/**
+ * success_form.php defines a form that is displayed when courses have successfully been inserted into moodle's course database
+ */
 class successform extends moodleform {
     
     public function __construct()

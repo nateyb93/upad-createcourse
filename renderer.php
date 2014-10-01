@@ -1,6 +1,9 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Defines the renderer for the createcourse plugin pages
+ */
 class tool_createcourse_renderer extends plugin_renderer_base
 {
     const INDEX_PAGE_IMPORT_STEP = 1;

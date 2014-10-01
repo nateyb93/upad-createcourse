@@ -1,7 +1,7 @@
 <?php
 /**
- * bannerimport_form.php defines a form that is shown when a selection of courses has been imported from the banner database within UP's course system.
- * 
+ * confirmation_form.php defines a form that is shown when a selection of courses has been imported from the banner database within UP's course system.
+ * adds an extra layer of security to adding courses to moodle's database
  */
 class confirmationform extends moodleform {
     
