@@ -8,6 +8,7 @@ require('../../../config.php');
 global $CFG;
 global $PAGE;
 global $SESSION;
+global $DB;
 
 /* configuration stuff */
 require_login();
@@ -46,11 +47,15 @@ else if($postData = $createcourseform->get_data())
     if(!empty($postData->termcode))
     {
         //set term data to form data and set session variables to access in other functions from other pages
-        $term_data = array(
-            'termcode' => $postData->termcode,
-            'suffix' => $postData->suffix,
-            'category_id' => $postData->categoryid
-        );
+        $term_data = new stdClass();
+        $term_data->termcode = $postData->termcode;
+        $term_data->suffix = $postData->suffix;
+        $term_data->categoryid = $postData->categoryid;
+        
+        //insert new term data
+        //$DB->insert_record('tool_createcourse', $term_data, false);
+        
+        //set session variables
         $SESSION->term_data = $term_data;
         $SESSION->courses = array();
         $SESSION->imports = up_import_courses();
@@ -72,9 +77,21 @@ else if($postData = $createcourseform->get_data())
         echo $renderer->index_page($confirmationform, $step);      
     }
 }
+else if(!isset($SESSION->currentpage))
+{
+    //set current page and render base index page.
+    $step = $renderer::INDEX_PAGE_IMPORT_STEP;
+    $SESSION->currentpage = $step;
+    echo $renderer->index_page($createcourseform, $step);
+}
 //confirmation page
-else if($SESSION->currentpage == $renderer::INDEX_PAGE_CONFIRMATION_STEP) {
+else if($SESSION->currentpage == $renderer::INDEX_PAGE_CONFIRMATION_STEP)
+{
+    //insert term data into database
+    $DB->insert_record('tool_createcourse', $SESSION->term_data);
+    
     //retrieve the imported classes from the session variables, build the courses, and insert the courses into the database.
+    $DB->insert_record('tool_createcourse', $SESSION->term_data);
     $imports = $SESSION->imports;
     up_build_courses($imports);
     up_insert_courses();
@@ -87,7 +104,7 @@ else if($SESSION->currentpage == $renderer::INDEX_PAGE_CONFIRMATION_STEP) {
     $successform = new successform();
     echo $renderer->index_page($successform, $step);
 }
-//other cases
+//base case, root page
 else
 {
     //set current page and render base index page.

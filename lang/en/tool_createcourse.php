@@ -1,4 +1,5 @@
 <?php
+global $SESSION;
 $string['pluginname'] = 'Create new courses';
 $string['header'] = 'Import courses from banner to be entered into the course database';
 
@@ -69,7 +70,7 @@ $string['importpage_header'] = "Category information";
 $string['importpage_description'] = "Enter information here for a new category. If it isn't already in the database, it will be added.";
 
 $string['confirmationpage_header'] = 'Confirm Submission';
-$string['confirmationpage_text'] = 'Are you sure you wish to insert these courses?';
+$string['confirmationpage_text'] = 'Are you sure you wish to add these courses?';
 $string['confirmationpage_submit'] = 'Submit';
 
 

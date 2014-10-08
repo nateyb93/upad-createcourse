@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="admin/tool/createcourse/db" VERSION="20131129" COMMENT="XMLDB file for Moodle admin/tool/createcourse"
+<XMLDB PATH="admin/tool/createcourse/db" VERSION="20141002" COMMENT="XMLDB file for Moodle admin/tool/createcourse"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
     <TABLE NAME="tool_createcourse" COMMENT="Course database information">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="protocol"/>
-        <FIELD NAME="protocol" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" NEXT="hostname" PREVIOUS="id"/>
-        <FIELD NAME="hostname" TYPE="char" LENGTH="128" NOTNULL="true" SEQUENCE="false" NEXT="portno" PREVIOUS="protocol"/>
-        <FIELD NAME="portno" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" PREVIOUS="hostname"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="true" COMMENT="id field for termcode table"/>
+        <FIELD NAME="termcode" TYPE="int" LENGTH="6" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="suffix" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="categoryid" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="id" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="mdl_toolcreate_pro_ix" UNIQUE="false" FIELDS="protocol" COMMENT="index for protocol field." NEXT="mdl_toolcreate_hst_ix"/>
-        <INDEX NAME="mdl_toolcreate_hst_ix" UNIQUE="false" FIELDS="hostname" COMMENT="index for hostname field." PREVIOUS="mdl_toolcreate_pro_ix" NEXT="mdl_toolcreate_prt_ix"/>
-        <INDEX NAME="mdl_toolcreate_prt_ix" UNIQUE="false" FIELDS="portno" COMMENT="index for portno field." PREVIOUS="mdl_toolcreate_hst_ix"/>
+        <INDEX NAME="mdl_toolcreate_trm_ix" UNIQUE="true" FIELDS="termcode" COMMENT="index for termcode field."/>
+        <INDEX NAME="mdl_toolcreate_suf_ix" UNIQUE="true" FIELDS="suffix" COMMENT="index for suffix field."/>
+        <INDEX NAME="mdl_toolcreate_cid_ix" UNIQUE="true" FIELDS="categoryid" COMMENT="index for categoryid field."/>
       </INDEXES>
     </TABLE>
   </TABLES>

@@ -28,18 +28,21 @@ class createcourse_form extends moodleform {
         $mform->addElement('text', 'termcode', get_string('importpage_termcode', 'tool_createcourse'));
         $mform->setType('termcode', PARAM_NOTAGS);
         $mform->setDefault('termcode', '');
+        $mform->addRule('termcode', null, 'required', null, 'client');
         
         $this->addSpacer($mform);
         
         $mform->addElement('text', 'suffix', get_string('importpage_suffix', 'tool_createcourse'));
         $mform->setType('suffix', PARAM_NOTAGS);
         $mform->setDefault('suffix', '');
+        $mform->addRule('suffix', null, 'required', null, 'client');
         
         $this->addSpacer($mform);
         
         $mform->addElement('text', 'categoryid', get_string('importpage_categoryid', 'tool_createcourse'));
         $mform->setType('categoryid', PARAM_NOTAGS);
         $mform->setDefault('categoryid', '');
+        $mform->addRule('categoryid', null, 'required', null, 'client');
         
         
         //adds the submit, reset, and cancel buttons to the form

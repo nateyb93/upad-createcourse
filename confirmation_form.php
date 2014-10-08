@@ -12,16 +12,17 @@ class confirmationform extends moodleform {
     }
     
     public function definition() {
+        global $SESSION;
         $mform =& $this->_form;
         
+        $num_courses = $SESSION->num_courses;
         //header
         $mform->addElement('header', 'importcourses', get_string('confirmationpage_header', 'tool_createcourse'));
-        $mform->addElement('html', '<span>' . get_string('confirmationpage_text','tool_createcourse') . '</span>');
+        $mform->addElement('html', '<span>' . "You are about to add $num_courses courses to Moodle. ".get_string('confirmationpage_text','tool_createcourse') . '</span>');
         
         $buttonarray = array();
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('confirmationpage_submit', 'tool_createcourse'));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
-
     }
 }

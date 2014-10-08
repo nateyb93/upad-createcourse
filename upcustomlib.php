@@ -107,6 +107,8 @@ function get_db_info()
  */
 function up_import_courses()
 {
+    global $SESSION;
+    
     // Connect to Banner and retrieve tables
     $query = "SELECT VW_UPM_COURSES.CRN,VW_UPM_COURSES.TERMCODE,VW_UPM_COURSES.COURSE_LONG_NAME,VW_UPM_COURSES.COURSE_SHORT_NAME,VW_UPM_COURSES.START_DATE,VW_UPM_COURSES.END_DATE,TBL_UPM_COURSE_SYNC.CREATED FROM UP_MOODLE.VW_UPM_COURSES LEFT OUTER JOIN UP_MOODLE.TBL_UPM_COURSE_SYNC ON VW_UPM_COURSES.CRN = TBL_UPM_COURSE_SYNC.CRN WHERE TBL_UPM_COURSE_SYNC.CRN is null";
     $dbinfo = get_db_info();
@@ -122,6 +124,8 @@ function up_import_courses()
 
     //get rows from table
     $rows = oci_fetch_all( $sql,$results,0,$totalrows,OCI_FETCHSTATEMENT_BY_ROW );
+    
+    $SESSION->num_courses = $rows;
     
     if( UP_DEBUG )	{
 	print "$rows classes queried<br />\n";
@@ -272,6 +276,7 @@ function up_insert_course($course)
     global $DB, $oc;
     $courserequestnumber = $course->idnumber;
     $category = $course->category;
+   
     // Check if the course exists
     if( up_course_exists( $courserequestnumber, $category ) )
     {
