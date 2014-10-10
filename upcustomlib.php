@@ -127,10 +127,6 @@ function up_import_courses()
     
     $SESSION->num_courses = $rows;
     
-    if( UP_DEBUG )	{
-	print "$rows classes queried<br />\n";
-    }
-    
     return $results;
 }
 

@@ -66,6 +66,7 @@ $string['importpage_suffix'] = 'Suffix';
 
 
 $string['importpage_submit'] = 'Submit';
+$string['importpage_importbutton'] = 'Import Courses';
 $string['importpage_header'] = "Category information";
 $string['importpage_description'] = "Enter information here for a new category. If it isn't already in the database, it will be added.";
 

@@ -44,13 +44,21 @@ class createcourse_form extends moodleform {
         $mform->setDefault('categoryid', '');
         $mform->addRule('categoryid', null, 'required', null, 'client');
         
+        $this->addSpacer($mform);
+        
+        //add a button that doesn't submit the entire form
+//        $mform->registerNoSubmitButton('importbutton');
+//        $importsubmit = array();
+//        $importsubmit[] = &$mform->createElement('submit', 'importbutton', get_string('importpage_importbutton', 'tool_createcourse'));
+//        $mform->addGroup($importsubmit);
+        
         
         //adds the submit, reset, and cancel buttons to the form
-        $buttonarray = array();
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('importpage_submit', 'tool_createcourse'));
-        $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'));
-        $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'buttonarr', '', array(' '), false);
+        $submitarray = array();
+        $submitarray[] = &$mform->createElement('submit', 'submitbutton', get_string('importpage_submit', 'tool_createcourse'));
+        $submitarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'));
+        $submitarray[] = &$mform->createElement('cancel');
+        $mform->addGroup($submitarray, 'buttonarr', '', array(' '), false);
         $mform->closeHeaderBefore('buttonarr');
     }
     

@@ -29,7 +29,6 @@ require_once(__DIR__ . '/upcustomlib.php');
 admin_externalpage_setup('tool_createcourse_create');
 /* end configuration stuff */
 
-
 //base index page rendering
 $createcourseform = new createcourse_form();
 $renderer = $PAGE->get_renderer('tool_createcourse');
@@ -43,8 +42,22 @@ if($createcourseform->is_cancelled()) {
 //TODO: spice this up. add form validation to make sure all forms are filled
 else if($postData = $createcourseform->get_data())
 {    
+    if(!empty($postData->confirmimport))
+    {
+        //insert term data into moodle database
+        $DB->insert_record('tool_createcourse', $SESSION->term_data);
+        up_build_courses($SESSION->imports);
+        up_insert_courses();
+        
+        
+        //render success page
+        $step = $renderer::INDEX_PAGE_SUCCESS_STEP;
+       
+        $successform = new successform();
+        echo $renderer->index_page($successform, $step);
+    }
     //check the posted data for the termcode
-    if(!empty($postData->termcode))
+    else if(!empty($postData->termcode))
     {
         //set term data to form data and set session variables to access in other functions from other pages
         $term_data = new stdClass();
@@ -52,18 +65,11 @@ else if($postData = $createcourseform->get_data())
         $term_data->suffix = $postData->suffix;
         $term_data->categoryid = $postData->categoryid;
         
-        //insert new term data
-        //$DB->insert_record('tool_createcourse', $term_data, false);
-        
         //set session variables
         $SESSION->term_data = $term_data;
         $SESSION->courses = array();
         $SESSION->imports = up_import_courses();
         $step = $renderer::INDEX_PAGE_CONFIRMATION_STEP;
-        $SESSION->currentpage = $step;
-        
-        //create confirmation form to add extra layer of security.
-        $confirmationform = new confirmationform();
 
         //make sure we're getting data from the form
         /*
@@ -74,44 +80,15 @@ else if($postData = $createcourseform->get_data())
         */
         
         //render the page
-        echo $renderer->index_page($confirmationform, $step);      
+        echo $renderer->index_page($createcourseform, $step);    
     }
-}
-else if(!isset($SESSION->currentpage))
-{
-    //set current page and render base index page.
-    $step = $renderer::INDEX_PAGE_IMPORT_STEP;
-    $SESSION->currentpage = $step;
-    echo $renderer->index_page($createcourseform, $step);
-}
-//confirmation page
-else if($SESSION->currentpage == $renderer::INDEX_PAGE_CONFIRMATION_STEP)
-{
-    //insert term data into database
-    $DB->insert_record('tool_createcourse', $SESSION->term_data);
-    
-    //retrieve the imported classes from the session variables, build the courses, and insert the courses into the database.
-    $DB->insert_record('tool_createcourse', $SESSION->term_data);
-    $imports = $SESSION->imports;
-    up_build_courses($imports);
-    up_insert_courses();
-    
-    //set current page
-    $step = $renderer::INDEX_PAGE_SUCCESS_STEP;
-    $SESSION->currentpage = $step;
-    
-    //render page
-    $successform = new successform();
-    echo $renderer->index_page($successform, $step);
 }
 //base case, root page
 else
 {
     //set current page and render base index page.
     $step = $renderer::INDEX_PAGE_IMPORT_STEP;
-    $SESSION->currentpage = $step;
     echo $renderer->index_page($createcourseform, $step);
-    
 }
 
 ?>

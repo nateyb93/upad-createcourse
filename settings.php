@@ -2,7 +2,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 if($hassiteconfig) {
-    $ADMIN->add('accounts',
+    $ADMIN->add('courses',
                 new admin_category('tool_createcourse', get_string('pluginname', 'tool_createcourse')));
     
     $ADMIN->add('tool_createcourse',
