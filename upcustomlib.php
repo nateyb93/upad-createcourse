@@ -1,11 +1,11 @@
-<?php 
+<?php
 /**
  * upcustomlib.php defines custom functions to use for inserting imported courses into moodle's database
- * 
+ *
  */
 
 /* initialization stuff */
-defined('MOODLE_INTERNAL') || die ;
+defined('MOODLE_INTERNAL') || die('moodle_internal not defined');
 require_once("$CFG->libdir/externallib.php");
 
 define( 'COURSE_ALREADY_EXISTS', -1 );
@@ -38,14 +38,13 @@ define( 'UP_DEBUG', true );
 
 /**
  * Retrives database information for the banner database containing course information
- * MAKE SURE YOU CHECK FOR NULL WHEN USING
  * @global type $DB
- * @return type
+ * @return stdObject containing database information
  */
 function get_db_info()
 {
     global $DB;
-    
+
     $infoArr = array(
         'dbinfo_protocol',
         'dbinfo_hostname',
@@ -56,10 +55,10 @@ function get_db_info()
         'importsettings_maxcourses'
     );
     //get database information from moodle's configuration/settings table
-    $banner_query = "SELECT name,value FROM {config} WHERE name= ? OR name= ? OR name= ? OR name= ? OR name= ? OR name= ? OR name= ?"; 
+    $banner_query = "SELECT name,value FROM {config} WHERE name= ? OR name= ? OR name= ? OR name= ? OR name= ? OR name= ? OR name= ?";
 
     $records = $DB->get_records_sql($banner_query, $infoArr);
-    
+
     if(count($records) == 0) {
         //
         echo "Please provide valid database information by visiting the settings page for this plugin.\n";
@@ -68,17 +67,17 @@ function get_db_info()
     {
         //testing values
         //var_dump($records);
-        
+
         $banner_protocol = $records['dbinfo_protocol']->value;
         $banner_hostname = $records['dbinfo_hostname']->value;
         $banner_portno = $records['dbinfo_portno']->value;
-        
+
         $banner_username = $records['dbauth_login']->value;
         $banner_password = $records['dbauth_password']->value;
         $banner_sid = $records['dbauth_sid']->value;
-        
+
         $banner_maxcourses = $records['importsettings_maxcourses']->value;
-        
+
         //create banner connection string from database rows
         $banner_db = "(DESCRIPTION =
                 (ADDRESS =
@@ -96,19 +95,19 @@ function get_db_info()
             'maxcourses' => $banner_maxcourses
         );
 
-        return $db_connect_info; 
+        return $db_connect_info;
     }
 }
 
 
 /**
  * Gets all course information from the current semester's termcode from the banner database
- * @return type array
+ * @return type array containing imported courses
  */
 function up_import_courses()
 {
     global $SESSION;
-    
+
     // Connect to Banner and retrieve tables
     $query = "SELECT VW_UPM_COURSES.CRN,VW_UPM_COURSES.TERMCODE,VW_UPM_COURSES.COURSE_LONG_NAME,VW_UPM_COURSES.COURSE_SHORT_NAME,VW_UPM_COURSES.START_DATE,VW_UPM_COURSES.END_DATE,TBL_UPM_COURSE_SYNC.CREATED FROM UP_MOODLE.VW_UPM_COURSES LEFT OUTER JOIN UP_MOODLE.TBL_UPM_COURSE_SYNC ON VW_UPM_COURSES.CRN = TBL_UPM_COURSE_SYNC.CRN WHERE TBL_UPM_COURSE_SYNC.CRN is null";
     $dbinfo = get_db_info();
@@ -120,13 +119,13 @@ function up_import_courses()
 
     // Set total rows to be processed. Set to 0 to get all rows.
     //in plugin settings
-    $totalrows = $dbinfo['maxcourses']; 
+    $totalrows = $dbinfo['maxcourses'];
 
     //get rows from table
     $rows = oci_fetch_all( $sql,$results,0,$totalrows,OCI_FETCHSTATEMENT_BY_ROW );
-    
+
     $SESSION->num_courses = $rows;
-    
+
     return $results;
 }
 
@@ -136,18 +135,21 @@ function up_import_courses()
  * @global type $CFG
  * @global type $DB
  * @global type $oc
- * @param type $courserequestnumber
- * @param type $shortname
- * @param type $fullname
- * @param type $startdate
- * @param type $enddate
- * @param type $termcode
+ * @param type $courserequestnumber CRN for course to build
+ * @param type $shortname course shortname
+ * @param type $fullname course full name
+ * @param type $startdate course start date
+ * @param type $enddate course end date
+ * @param type $termcode course term code
  */
 function up_build_course( $courserequestnumber, $shortname, $fullname, $startdate, $enddate, $termcode )
-{	
+{
     global $SESSION;
-    if( UP_DEBUG ){ 
-            print "calling :: build_course( $courserequestnumber, $shortname, $fullname, $startdate, $termcode )<br />\n"; 
+
+    $form = new stdClass();
+
+    if( UP_DEBUG ){
+            print "calling :: build_course( $courserequestnumber, $shortname, $fullname, $startdate, $termcode )<br />\n";
     }
 
     // Retrieve the term information codes fetched earlier from banner and stored in the session variable 'term_data'
@@ -155,7 +157,7 @@ function up_build_course( $courserequestnumber, $shortname, $fullname, $startdat
 
 
     // Blow up if false
-    if (!$term_data) { 
+    if (!$term_data) {
             print 'FAIL<br/>';
             print 'No term code category has been set in the database.';
             exit;
@@ -163,11 +165,11 @@ function up_build_course( $courserequestnumber, $shortname, $fullname, $startdat
 
     // Set the suffix and category
     $course_sn_postfix = $term_data->suffix;
-    $form->category = $term_data->category_id;
+    $form->category = $term_data->categoryid;
 
-    if( UP_DEBUG ){	
+    if( UP_DEBUG ){
             print 'SUFFIX:' . $term_data->suffix . '<br/>';
-            print 'CATEGORY:' . $term_data->category_id . '<br/>';
+            print 'CATEGORY:' . $term_data->categoryid . '<br/>';
     }
 
 
@@ -176,12 +178,13 @@ function up_build_course( $courserequestnumber, $shortname, $fullname, $startdat
     $form->shortname = $shortname . ' - ' . $course_sn_postfix;
     $form->fullname  = $form->shortname . ' - ' . $fullname;
     $form->summary   = "Welcome to $fullname." ;
+    $form->termcode = $termcode;
 
 
     // Reformat the date. It is returned in the format 29-AUG-05 from banner
     $form->startdate = strtotime( $startdate );
-
     $enddate = strtotime( $enddate );
+    $form->enddate = $enddate;
 
     // Calculate the total number of weeks for the course
     $total_weeks =  $enddate - $form->startdate;
@@ -191,7 +194,7 @@ function up_build_course( $courserequestnumber, $shortname, $fullname, $startdat
 
 
     $form->format      = "weeks";
-    $form->numsections = $total_weeks;  // The total number of weeks in the course 
+    $form->numsections = $total_weeks;  // The total number of weeks in the course
     $form->showgrades  = 1;
 
     $form->password       = '';
@@ -214,8 +217,8 @@ function up_build_course( $courserequestnumber, $shortname, $fullname, $startdat
     $SESSION->courses[] = $form;
 
  } // end of function build_course //
- 
- 
+
+
  /**
   * Cycles through list of imported courses and builds them for insertion into moodle's database.
   * @param type $courses array containing course information from banner database
@@ -246,8 +249,8 @@ function up_course_exists( $courserequestnumber, $category )
         return false;
     }
 
-    if ( UP_DEBUG ){ 
-        "calling: course_exists( $courserequestnumber )<br />\n"; 
+    if ( UP_DEBUG ){
+        "calling: course_exists( $courserequestnumber )<br />\n";
     }
 
     if (  $exists = $DB->get_records_select( 'course', "idnumber='$courserequestnumber' AND category='$category'" )  )
@@ -260,7 +263,7 @@ function up_course_exists( $courserequestnumber, $category )
     }
 
 }// end of function up_course_exists //
-  
+
 
 /**
  * Attempts to insert a course into the moodle database
@@ -272,22 +275,22 @@ function up_insert_course($course)
     global $DB, $oc;
     $courserequestnumber = $course->idnumber;
     $category = $course->category;
-   
+
     // Check if the course exists
     if( up_course_exists( $courserequestnumber, $category ) )
     {
         add_to_log( '1', 'course', 'error', '', "Course already exists: BannerID: $courserequestnumber", '','4');
 
         // Mark course as added in banner
-        $totalrows = 0;
-        $query = "INSERT INTO UP_MOODLE.TBL_UPM_COURSE_SYNC VALUES ('$courserequestnumber','$termcode','Y')";
+        $totalrows = 1;
+        $query = "INSERT INTO UP_MOODLE.TBL_UPM_COURSE_SYNC VALUES ('$courserequestnumber','$course->termcode','Y')";
         $sql   = oci_parse( $oc, $query );
 
         oci_execute( $sql );
 
         $rows = oci_fetch_all( $sql, $results, 0, $totalrows, OCI_FETCHSTATEMENT_BY_ROW );
 
-        if ($rows == false) {
+        if ($rows = false) {
             print 'Insert to TBL_UPM_COURSE_SYNC failed. Sync may be broken.';
             exit;
         }
@@ -297,12 +300,12 @@ function up_insert_course($course)
 
     // Set up new course
     //insert course
-    if( $newcourseid = $DB->insert_record('course', $form)  ) 
-    { 
+    if( $newcourseid = $DB->insert_record('course', $course)  )
+    {
 
         if ( UP_DEBUG )
-        { 
-          print "New Course ID is: " . $newcourseid . "<br />\n"; 
+        {
+          print "New Course ID is: " . $newcourseid . "<br />\n";
         }
 
  //       $section = NULL;
@@ -325,8 +328,8 @@ function up_insert_course($course)
         fix_course_sortorder();
 
         // Mark course as added in banner
-        $totalrows = 0;
-        $query = "INSERT INTO UP_MOODLE.TBL_UPM_COURSE_SYNC VALUES ('$courserequestnumber','$termcode','Y')";
+        $totalrows = 1;
+        $query = "INSERT INTO UP_MOODLE.TBL_UPM_COURSE_SYNC VALUES ('$courserequestnumber','$course->termcode','Y')";
         $sql   = oci_parse( $oc, $query );
 
         oci_execute( $sql );
@@ -337,7 +340,7 @@ function up_insert_course($course)
                 print 'Insert to TBL_UPM_COURSE_SYNC failed. Sync may be broken.';
                 exit;
         }
-        
+
         return COURSE_CREATION_SUCCEEDED;
 
     } else {
@@ -353,23 +356,23 @@ function up_insert_course($course)
  */
 function up_insert_courses(){
     global $SESSION;
-    
+
     //counters for created and failed courses
     $courses_created = 0;
     $courses_failed = 0;
-    
-    
+
+
     // Start timer for script
     $ts_timer = new Timer();
     $ts_timer->start();
-    
+
 //    //display confirmation prompt in the case that the user has initiated the course creation
 //    if ( $_GET['go'] != 'yes' ){
 //
 //	print '<div align="center">';
 //	print '<font color="red">Do you really want to import courses?</font><br />';
 //	print $rows . ' courses waiting to be imported<br />';
-//	print 'CONFIG INFORMATION :<br />'; 
+//	print 'CONFIG INFORMATION :<br />';
 //	print "moodlepath : $moodlepath <br />";
 //	print "database   : $CFG->dbname<br />";
 //	print 'debug: ' . UP_DEBUG . '<br />';
@@ -379,17 +382,17 @@ function up_insert_courses(){
 //	print '<input type="submit" value="Go &gt;&gt;">';
 //	print '</form>';
 //	print '</div>';
-//	exit;	
+//	exit;
 //    }
-    
+
     $j=0; // Start Counter //
-    
+
     //retrieve list of courses from session
     $courses = $SESSION->courses;
-    
+
     //cycle through each of the courses and get their information
     foreach( $courses as $data ){
-        
+
         if( UP_DEBUG )
         {
             print "<br /><br />ROW: $j<br />";
@@ -407,15 +410,15 @@ function up_insert_courses(){
                         if(UP_DEBUG){  print "COURSE ALREADY EXISTS<br />";  }
                 break;
                 case COURSE_CREATION_FAILED:
-                        if (UP_DEBUG){  
+                        if (UP_DEBUG){
                                 print "COURSE CREATION FAILED<br />";
                                 $courses_failed++;
                           }
                 break;
                 case COURSE_CREATION_SUCCEEDED:
-                        if (UP_DEBUG){  
-                                print "COURSE CREATION SUCCEDED<br />";  
-                                $courses_created++;	
+                        if (UP_DEBUG){
+                                print "COURSE CREATION SUCCEDED<br />";
+                                $courses_created++;
                         }
                 break;
                 case true:
@@ -426,11 +429,10 @@ function up_insert_courses(){
         $j++;
 
      }
-     
+
      $ts_timer->finish();
      // end foreach( $results as $data ) //
 
     echo '<br />action took: ' . $ts_timer->getTime() . " seconds.<br />" . "<br /> Courses created: " . $courses_created . " | Courses failed: " . $courses_failed;
     $SESSION->courses = array();
 }
-?>

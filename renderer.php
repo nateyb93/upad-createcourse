@@ -17,16 +17,19 @@ class tool_createcourse_renderer extends plugin_renderer_base
      * @return type
      */
     public function index_page(moodleform $mform, $step){
+        global $SESSION;
         $output = $this->header();
         switch($step)
         {
             case self::INDEX_PAGE_IMPORT_STEP:
+            case self::INDEX_PAGE_CONFIRMATION_STEP:
                 $output .= $this->moodleform($mform);
                 break;
             
-            case self::INDEX_PAGE_CONFIRMATION_STEP:
-                $output .= $this->moodleform($mform);
-                $output .= $this->moodleform(new confirmationform());
+           
+            
+            case self::INDEX_PAGE_SUCCESS_STEP:
+                $output .= $this->moodleform(new successform());
                 break;
             
             default:

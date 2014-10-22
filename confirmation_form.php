@@ -18,12 +18,13 @@ class confirmationform extends moodleform {
         $num_courses = $SESSION->num_courses;
         //header
         $mform->addElement('header', 'importcourses', get_string('confirmationpage_header', 'tool_createcourse'));
-        $mform->addElement('hidden', 'confirmimport', 'true');
-        $mform->setType('confirmimport', PARAM_NOTAGS);
+        
+        //text
         $mform->addElement('html', '<span>' . "You are about to add $num_courses courses to Moodle. ".get_string('confirmationpage_text','tool_createcourse') . '</span>');
         
+        $mform->registerNoSubmitButton('confirmsubmit');
         $buttonarray = array();
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('confirmationpage_submit', 'tool_createcourse'));
+        $buttonarray[] = &$mform->createElement('submit', 'confirmsubmit', get_string('confirmationpage_submit', 'tool_createcourse'));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
     }

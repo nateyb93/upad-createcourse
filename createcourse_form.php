@@ -16,6 +16,7 @@ class createcourse_form extends moodleform {
         
         $mform = $this->_form;
         
+        
         //$mform->addElement('html', '<link rel="stylesheet" type="text/css" href="styles.css"');
         //adds header and description to page
         $mform->addElement('header', 'importpage_header', get_string('importpage_header', 'tool_createcourse'));

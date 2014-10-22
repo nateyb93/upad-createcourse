@@ -9,6 +9,7 @@ global $CFG;
 global $PAGE;
 global $SESSION;
 global $DB;
+global $OUTPUT;
 
 /* configuration stuff */
 require_login();
@@ -38,26 +39,15 @@ $renderer = $PAGE->get_renderer('tool_createcourse');
 if($createcourseform->is_cancelled()) {
     //handle form cancel operation
 }
+else if($createcourseform->no_submit_button_pressed()){
+
+}
 //has posted data; this would only be accessible from course creation form
 //TODO: spice this up. add form validation to make sure all forms are filled
 else if($postData = $createcourseform->get_data())
 {    
-    if(!empty($postData->confirmimport))
-    {
-        //insert term data into moodle database
-        $DB->insert_record('tool_createcourse', $SESSION->term_data);
-        up_build_courses($SESSION->imports);
-        up_insert_courses();
-        
-        
-        //render success page
-        $step = $renderer::INDEX_PAGE_SUCCESS_STEP;
-       
-        $successform = new successform();
-        echo $renderer->index_page($successform, $step);
-    }
     //check the posted data for the termcode
-    else if(!empty($postData->termcode))
+    if(!empty($postData->termcode))
     {
         //set term data to form data and set session variables to access in other functions from other pages
         $term_data = new stdClass();
@@ -80,7 +70,18 @@ else if($postData = $createcourseform->get_data())
         */
         
         //render the page
-        echo $renderer->index_page($createcourseform, $step);    
+        echo $renderer->index_page($createcourseform, $step);
+        
+        echo 'Starting...';
+
+        $DB->insert_record('tool_createcourse', $SESSION->term_data);
+
+        up_build_courses($SESSION->imports);
+
+        up_insert_courses();
+
+        echo 'Success!';
+        
     }
 }
 //base case, root page
