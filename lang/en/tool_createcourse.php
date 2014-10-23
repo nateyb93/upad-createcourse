@@ -71,7 +71,7 @@ $string['importpage_header'] = "Category information";
 $string['importpage_description'] = "Enter information here for a new category. If it isn't already in the database, it will be added.";
 
 $string['confirmationpage_header'] = 'Confirm Submission';
-$string['confirmationpage_text'] = 'Are you sure you wish to add these courses?';
+$string['confirmationpage_text'] = 'Be sure the information above is correct before clicking submit!';
 $string['confirmationpage_submit'] = 'Submit';
 
 

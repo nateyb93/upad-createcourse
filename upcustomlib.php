@@ -312,12 +312,13 @@ function up_insert_course($course) {
 		add_to_log ( '1', 'course', 'error', '', "Course already exists: BannerID: $courserequestnumber", '', '4' );
 
 		// Mark course as added in banner
-		$totalrows = 1;
+		$totalrows = 0;
 		$query = "INSERT INTO UP_MOODLE.TBL_UPM_COURSE_SYNC VALUES ('$courserequestnumber','$course->termcode','Y')";
 		$sql = oci_parse ( $oc, $query );
 
 		oci_execute ( $sql );
 
+		$results = array();
 		$rows = oci_fetch_all ( $sql, $results, 0, $totalrows, OCI_FETCHSTATEMENT_BY_ROW );
 
 		if ($rows = false) {
@@ -336,18 +337,15 @@ function up_insert_course($course) {
 			print "New Course ID is: " . $newcourseid . "<br />\n";
 		}
 
-		// $section = NULL;
-		// $section->course = $newcourseid; // Create a default section.
-		// $section->section = 0;
-		// $section->id = $DB->insert_record("course_sections", $section);
-
-		$course = $DB->get_record ( 'course', array (
+		//get the newly inserted course so we can add the default blocks
+		$newMoodleCourse = $DB->get_record ( 'course', array (
 				'id' => $newcourseid
 		) );
 
 		// Setup the blocks
-		blocks_add_default_course_blocks ( $course );
+		blocks_add_default_course_blocks ( $newMoodleCourse );
 
+		//set section information and insert into the section database
 		$section = new stdClass ();
 		$section->course = $newcourseid; // Create a default section.
 		$section->section = 0;
@@ -356,13 +354,15 @@ function up_insert_course($course) {
 
 		fix_course_sortorder ();
 
+
 		// Mark course as added in banner
-		$totalrows = 1;
+		$totalrows = 0;
 		$query = "INSERT INTO UP_MOODLE.TBL_UPM_COURSE_SYNC VALUES ('$courserequestnumber','$course->termcode','Y')";
 		$sql = oci_parse ( $oc, $query );
 
 		oci_execute ( $sql );
 
+		$results = array();
 		$rows = oci_fetch_all ( $sql, $results, 0, $totalrows, OCI_FETCHSTATEMENT_BY_ROW );
 
 		if ($rows = false) {

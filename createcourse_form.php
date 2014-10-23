@@ -12,57 +12,72 @@ class createcourse_form extends moodleform {
      * @global type $CFG
      */
     public function definition() {
-        global $CFG;
-        
+        global $CFG, $DB;
+
         $mform = $this->_form;
-        
-        
+
+
         //$mform->addElement('html', '<link rel="stylesheet" type="text/css" href="styles.css"');
         //adds header and description to page
         $mform->addElement('header', 'importpage_header', get_string('importpage_header', 'tool_createcourse'));
         $mform->addElement('html', '<span>' . get_string('importpage_description', 'tool_createcourse') . '</span>');
-        
+
         $this->addSpacer($mform);
         $this->addSpacer($mform);
-        
+
         //adds textboxes for inputting data for course
         $mform->addElement('text', 'termcode', get_string('importpage_termcode', 'tool_createcourse'));
         $mform->setType('termcode', PARAM_NOTAGS);
         $mform->setDefault('termcode', '');
         $mform->addRule('termcode', null, 'required', null, 'client');
-        
+
         $this->addSpacer($mform);
-        
+
         $mform->addElement('text', 'suffix', get_string('importpage_suffix', 'tool_createcourse'));
         $mform->setType('suffix', PARAM_NOTAGS);
         $mform->setDefault('suffix', '');
         $mform->addRule('suffix', null, 'required', null, 'client');
-        
+
         $this->addSpacer($mform);
-        
-        $mform->addElement('text', 'categoryid', get_string('importpage_categoryid', 'tool_createcourse'));
-        $mform->setType('categoryid', PARAM_NOTAGS);
-        $mform->setDefault('categoryid', '');
+
+        //create multiselect for category ids; can only use a category id that already exists
+        $query = "SELECT id FROM {course_categories}";
+        $records = $DB->get_records_sql($query);
+        $options = array();
+        $options[] = '';
+        foreach($records as $record)
+        {
+        	$options[] = $record->id;
+        }
+        $mform->addElement('select', 'categoryid', get_string('importpage_categoryid', 'tool_createcourse'), $options);
         $mform->addRule('categoryid', null, 'required', null, 'client');
-        
+
+//         $mform->addElement('text', 'categoryid', get_string('importpage_categoryid', 'tool_createcourse'));
+//         $mform->setType('categoryid', PARAM_NOTAGS);
+//         $mform->setDefault('categoryid', '');
+//         $mform->addRule('categoryid', null, 'required', null, 'client');
+
         $this->addSpacer($mform);
-        
+
         //add a button that doesn't submit the entire form
 //        $mform->registerNoSubmitButton('importbutton');
 //        $importsubmit = array();
 //        $importsubmit[] = &$mform->createElement('submit', 'importbutton', get_string('importpage_importbutton', 'tool_createcourse'));
 //        $mform->addGroup($importsubmit);
-        
-        
+
+
+        $mform->addElement('html', '<span>' . get_string('confirmationpage_text', 'tool_createcourse') . '</span>');
         //adds the submit, reset, and cancel buttons to the form
         $submitarray = array();
         $submitarray[] = &$mform->createElement('submit', 'submitbutton', get_string('importpage_submit', 'tool_createcourse'));
         $submitarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'));
         $submitarray[] = &$mform->createElement('cancel');
         $mform->addGroup($submitarray, 'buttonarr', '', array(' '), false);
+
+
         $mform->closeHeaderBefore('buttonarr');
     }
-    
+
     /**
      * Adds a line break to the document.
      * @param type $mform form to add spacer to
@@ -71,5 +86,5 @@ class createcourse_form extends moodleform {
     {
         $mform->addElement('html', '<br/>');
     }
-    
+
 }
