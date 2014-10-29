@@ -15,7 +15,6 @@ global $OUTPUT;
 require_login();
 
 require_once __DIR__ . '/createcourse_form.php';
-require_once __DIR__ . '/confirmation_form.php';
 require_once __DIR__ . '/success_form.php';
 
 error_reporting(E_ALL);
@@ -34,18 +33,21 @@ admin_externalpage_setup('tool_createcourse_create');
 $createcourseform = new createcourse_form();
 $renderer = $PAGE->get_renderer('tool_createcourse');
 
+//conditionally initialize the session variable for this plugin.
+if(empty($SESSION->tool_createcourse))
+{
+	$SESSION->tool_createcourse = new stdClass();
+}
 
 //check for data stuff
 if($createcourseform->is_cancelled()) {
     //handle form cancel operation
-}
-else if($createcourseform->no_submit_button_pressed()){
-
+    //pretty much want to do nothing here; cease operations
 }
 //has posted data; this would only be accessible from course creation form
 //TODO: spice this up. add form validation to make sure all forms are filled
 else if($postData = $createcourseform->get_data())
-{    
+{
     //check the posted data for the termcode
     if(!empty($postData->termcode))
     {
@@ -54,42 +56,50 @@ else if($postData = $createcourseform->get_data())
         $term_data->termcode = $postData->termcode;
         $term_data->suffix = $postData->suffix;
         $term_data->categoryid = $postData->categoryid;
-        
+        $term_data->hidden = $postData->hideterm;
+
+        //make sure the category exists.
+        up_category_exists($term_data->categoryid) or die("Category $term_data->categoryid does not exist in Moodle database. Add it or choose a different category.");
+
+
         //set session variables
-        $SESSION->term_data = $term_data;
-        $SESSION->courses = array();
-        $SESSION->imports = up_import_courses();
-        $step = $renderer::INDEX_PAGE_CONFIRMATION_STEP;
+        //term_data contains termcode, suffix, and category_id entered into the form
+        //Courses contains built courses
+        //Imports contains raw banner import data
+        $SESSION->tool_createcourse->term_data = $term_data;
+        $SESSION->tool_createcourse->courses = array();
+        $SESSION->tool_createcourse->imports = up_import_courses();
 
         //make sure we're getting data from the form
         /*
         if( UP_DEBUG )
         {
-            var_dump($term_data); 
-        } 
+            var_dump($term_data);
+        }
         */
-        
+
         //render the page
-        echo $renderer->index_page($createcourseform, $step);
-        
+        echo $renderer->index_page($createcourseform);
+
         echo 'Starting...';
 
-        $DB->insert_record('tool_createcourse', $SESSION->term_data);
+        //perform course insertion
+        //TODO: look to move this elsewhere
+        $DB->insert_record('tool_createcourse', $SESSION->tool_createcourse->term_data) or die("Error");
 
-        up_build_courses($SESSION->imports);
+        up_build_courses($SESSION->tool_createcourse->imports);
 
         up_insert_courses();
 
         echo 'Success!';
-        
+
     }
 }
 //base case, root page
 else
 {
     //set current page and render base index page.
-    $step = $renderer::INDEX_PAGE_IMPORT_STEP;
-    echo $renderer->index_page($createcourseform, $step);
+    echo $renderer->index_page($createcourseform);
 }
 
 ?>

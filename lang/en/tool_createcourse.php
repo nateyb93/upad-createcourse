@@ -69,6 +69,8 @@ $string['importpage_submit'] = 'Submit';
 $string['importpage_importbutton'] = 'Import Courses';
 $string['importpage_header'] = "Category information";
 $string['importpage_description'] = "Enter information here for a new category. If it isn't already in the database, it will be added.";
+$string['importpage_hideterm'] = 'Hide term';
+$string['importpage_hideterm_info'] = 'Hide courses associated with the specified termcode in Moodle.';
 
 $string['confirmationpage_header'] = 'Confirm Submission';
 $string['confirmationpage_text'] = 'Be sure the information above is correct before clicking submit!';

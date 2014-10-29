@@ -6,21 +6,20 @@
 
 /* initialization stuff */
 defined ( 'MOODLE_INTERNAL' ) || die ( 'moodle_internal not defined' );
-require_once ("$CFG->libdir/externallib.php");
 
 define ( 'COURSE_ALREADY_EXISTS', - 1 );
 define ( 'COURSE_CREATION_FAILED', 0 );
 define ( 'COURSE_CREATION_SUCCEEDED', 1 );
 
+require_once ("$CFG->libdir/externallib.php");
 require_once ("$CFG->libdir/blocklib.php");
 require_once ("$CFG->libdir/pagelib.php");
+require_once ("$CFG->libdir/enrollib.php");
+
+require_once (__DIR__ . '/timer.php');
 
 error_reporting ( E_ALL );
 ini_set ( 'display_errors', 'ON' );
-
-require_once (__DIR__ . '/upconf.inc.php');
-
-require_once (__DIR__ . '/timer.php');
 
 // define('CLI_SCRIPT', true);
 
@@ -85,12 +84,12 @@ function get_db_info() {
             (CONNECT_DATA = (SID = $banner_sid))
         )";
 
-		$db_connect_info = array (
-				'db' => $banner_db,
-				'username' => $banner_username,
-				'password' => $banner_password,
-				'maxcourses' => $banner_maxcourses
-		);
+		$db_connect_info = new stdClass();
+
+		$db_connect_info->db = $banner_db;
+		$db_connect_info->username = $banner_username;
+		$db_connect_info->password = $banner_password;
+		$db_connect_info->maxcourses = $banner_maxcourses;
 
 		return $db_connect_info;
 	}
@@ -107,19 +106,19 @@ function up_import_courses() {
 	// Connect to Banner and retrieve tables
 	$query = "SELECT VW_UPM_COURSES.CRN,VW_UPM_COURSES.TERMCODE,VW_UPM_COURSES.COURSE_LONG_NAME,VW_UPM_COURSES.COURSE_SHORT_NAME,VW_UPM_COURSES.START_DATE,VW_UPM_COURSES.END_DATE,TBL_UPM_COURSE_SYNC.CREATED FROM UP_MOODLE.VW_UPM_COURSES LEFT OUTER JOIN UP_MOODLE.TBL_UPM_COURSE_SYNC ON VW_UPM_COURSES.CRN = TBL_UPM_COURSE_SYNC.CRN WHERE TBL_UPM_COURSE_SYNC.CRN is null";
 	$dbinfo = get_db_info ();
-	$oc = oci_connect ( $dbinfo ['username'], $dbinfo ['password'], $dbinfo ['db'] ) or die ( "could not connect to banner" );
+	$oc = oci_connect ( $dbinfo->username, $dbinfo->password, $dbinfo->db ) or die ( "could not connect to banner" );
 	$sql = oci_parse ( $oc, $query );
 
 	oci_execute ( $sql );
 
 	// Set total rows to be processed. Set to 0 to get all rows.
 	// in plugin settings
-	$totalrows = $dbinfo ['maxcourses'];
+	$totalrows = $dbinfo->maxcourses;
 
 	// get rows from table
 	$rows = oci_fetch_all ( $sql, $results, 0, $totalrows, OCI_FETCHSTATEMENT_BY_ROW );
 
-	$SESSION->num_courses = $rows;
+	$SESSION->tool_createcourse->num_courses = $rows;
 
 	return $results;
 }
@@ -153,7 +152,7 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 	}
 
 	// Retrieve the term information codes fetched earlier from banner and stored in the session variable 'term_data'
-	$term_data = $SESSION->term_data;
+	$term_data = $SESSION->tool_createcourse->term_data;
 
 	// Blow up if false
 	if (! $term_data) {
@@ -214,7 +213,7 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 	$form->timecreated = time ();
 	$form->timemodified = $form->timecreated;
 
-	$SESSION->courses [] = $form;
+	$SESSION->tool_createcourse->courses [] = $form;
 } // end of function build_course //
 
 
@@ -304,8 +303,9 @@ function up_insert_course($course) {
 	$courserequestnumber = $course->idnumber;
 	$category = $course->category;
 
+
 	$dbinfo = get_db_info();
-	$oc = oci_connect($dbinfo['username'], $dbinfo['password'], $dbinfo['db']);
+	$oc = oci_connect($dbinfo->username, $dbinfo->password, $dbinfo->db);
 
 	// Check if the course exists
 	if (up_course_exists ( $courserequestnumber, $category )) {
@@ -342,6 +342,9 @@ function up_insert_course($course) {
 				'id' => $newcourseid
 		) );
 
+
+		$data = $course;
+		$course = course_get_format($newcourseid)->get_course();
 		// Setup the blocks
 		blocks_add_default_course_blocks ( $newMoodleCourse );
 
@@ -354,10 +357,11 @@ function up_insert_course($course) {
 
 		fix_course_sortorder ();
 
+		up_add_enrol_plugin('manual', true, $course, $data);
 
 		// Mark course as added in banner
 		$totalrows = 0;
-		$query = "INSERT INTO UP_MOODLE.TBL_UPM_COURSE_SYNC VALUES ('$courserequestnumber','$course->termcode','Y')";
+		$query = "INSERT INTO UP_MOODLE.TBL_UPM_COURSE_SYNC VALUES ('$courserequestnumber','$data->termcode','Y')";
 		$sql = oci_parse ( $oc, $query );
 
 		oci_execute ( $sql );
@@ -415,7 +419,7 @@ function up_insert_courses() {
 	$j = 0; // Start Counter //
 
 	// retrieve list of courses from session
-	$courses = $SESSION->courses;
+	$courses = $SESSION->tool_createcourse->courses;
 
 	// cycle through each of the courses and get their information
 	foreach ( $courses as $data ) {
@@ -461,5 +465,45 @@ function up_insert_courses() {
 	// end foreach( $results as $data ) //
 
 	echo '<br />action took: ' . $ts_timer->getTime () . " seconds.<br />" . "<br /> Courses created: " . $courses_created . " | Courses failed: " . $courses_failed;
-	$SESSION->courses = array ();
+	$SESSION->tool_createcourse->courses = array ();
+}
+
+
+function up_add_enrol_plugin($name, $inserted, $course, $data)
+{
+	global $CFG;
+
+	$name = clean_param($name, PARAM_PLUGIN);
+
+	if(empty($name)) {
+		return false;
+	}
+
+
+	$location = "$CFG->dirroot/enrol/$name";
+	if(!file_exists("$location/lib.php")) {
+		//debug
+		//echo "<h1 style='font-weight:bold;font-size=32;color:#FF0000'>PLUGIN DOES NOT EXIST</h1>";
+		return false;
+	}
+
+	include_once("$location/lib.php");
+	$class = "enrol_{$name}_plugin";
+	if(!class_exists($class)) {
+		//debug
+		//echo "<h1 style='font-weight:bold;font-size=32;color:#FF0000'>CLASS DOES NOT EXIST</h1>";
+		return false;
+	}
+
+	$plugin = new $class();
+
+	if($inserted) {
+		if($plugin->get_config('defaultenrol')) {
+			$plugin->add_default_instance($course);
+		}
+	}
+
+	//debug
+	//echo "<h1 style='font-weight:bold;font-size=32'>Enrolment plugin added!</h1>";
+	return true;
 }

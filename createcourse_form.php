@@ -7,6 +7,14 @@ require_once("$CFG->libdir/formslib.php");
 require_once(__DIR__ . "/class_import.php");
 
 class createcourse_form extends moodleform {
+
+	public function __construct()
+	{
+		//set the data for this form.
+		parent::__construct();
+	}
+
+
     /**
      * defines the form for creating a new course
      * @global type $CFG
@@ -52,21 +60,20 @@ class createcourse_form extends moodleform {
         $mform->addElement('select', 'categoryid', get_string('importpage_categoryid', 'tool_createcourse'), $options);
         $mform->addRule('categoryid', null, 'required', null, 'client');
 
-//         $mform->addElement('text', 'categoryid', get_string('importpage_categoryid', 'tool_createcourse'));
-//         $mform->setType('categoryid', PARAM_NOTAGS);
-//         $mform->setDefault('categoryid', '');
-//         $mform->addRule('categoryid', null, 'required', null, 'client');
+        $this->addSpacer($mform);
+
+        //adds a checkbox for the 'hidden' field
+        $mform->addElement('advcheckbox',
+        				   'hideterm',
+        				   get_string('importpage_hideterm', 'tool_createcourse'),
+        				   get_string('importpage_hideterm_info', 'tool_createcourse'));
+        $mform->addRule('hideterm', null, 'required', null, 'client');
 
         $this->addSpacer($mform);
 
-        //add a button that doesn't submit the entire form
-//        $mform->registerNoSubmitButton('importbutton');
-//        $importsubmit = array();
-//        $importsubmit[] = &$mform->createElement('submit', 'importbutton', get_string('importpage_importbutton', 'tool_createcourse'));
-//        $mform->addGroup($importsubmit);
-
-
         $mform->addElement('html', '<span>' . get_string('confirmationpage_text', 'tool_createcourse') . '</span>');
+
+
         //adds the submit, reset, and cancel buttons to the form
         $submitarray = array();
         $submitarray[] = &$mform->createElement('submit', 'submitbutton', get_string('importpage_submit', 'tool_createcourse'));
