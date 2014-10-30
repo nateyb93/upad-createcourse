@@ -29,7 +29,10 @@ function xmldb_tool_createcourse_upgrade($oldversion)
         $table->add_index('mdl_toolcreate_suf_ix', XMLDB_INDEX_UNIQUE, array('suffix'));
         $table->add_index('mdl_toolcreate_cid_ix', XMLDB_INDEX_UNIQUE, array('categoryid'));
 
-        //$dbman->create_table($table);
+        if(!$dbman->table_exists($table))
+        {
+        	$dbman->create_table($table);
+        }
 
         upgrade_plugin_savepoint(true, 2014102901, 'tool', 'createcourse');
     }

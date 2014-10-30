@@ -1,6 +1,6 @@
 <?php
 global $SESSION;
-$string['pluginname'] = 'Create new courses';
+$string['pluginname'] = 'Import banner courses';
 $string['header'] = 'Import courses from banner to be entered into the course database';
 
 //database information

@@ -85,11 +85,19 @@ else if($postData = $createcourseform->get_data())
 
         //perform course insertion
         //TODO: look to move this elsewhere
-        $DB->insert_record('tool_createcourse', $SESSION->tool_createcourse->term_data) or die("Error");
+        if(!up_term_exists($term_data->termcode, $term_data->suffix, $term_data->categoryid))
+        {
+        	$DB->insert_record('tool_createcourse', $SESSION->tool_createcourse->term_data) or die("Error");
+        }
+        else
+        {
+        	die ("Term data for the term you specified already exists. Please enter different data");
+        }
 
+
+        //builds and inserts courses into moodle database
         up_build_courses($SESSION->tool_createcourse->imports);
-
-        up_insert_courses();
+        up_insert_courses($SESSION->tool_createcourse->courses);//uses session variable, does not require a parameter
 
         echo 'Success!';
 

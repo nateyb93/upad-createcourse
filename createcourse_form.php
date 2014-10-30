@@ -66,9 +66,11 @@ class createcourse_form extends moodleform {
         $mform->addElement('advcheckbox',
         				   'hideterm',
         				   get_string('importpage_hideterm', 'tool_createcourse'),
-        				   get_string('importpage_hideterm_info', 'tool_createcourse'));
-        $mform->addRule('hideterm', null, 'required', null, 'client');
+        				   get_string('importpage_hideterm_info', 'tool_createcourse'),
+        	 /*attributes*/null,
+      /*un/checked values*/array(0,1));
 
+        $this->addSpacer($mform);
         $this->addSpacer($mform);
 
         $mform->addElement('html', '<span>' . get_string('confirmationpage_text', 'tool_createcourse') . '</span>');

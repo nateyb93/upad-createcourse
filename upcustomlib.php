@@ -248,6 +248,28 @@ function up_category_exists($categoryid) {
 }
 
 /**
+ * Checks to see if term data exists for the specified paramaters
+ * @param unknown $termcode
+ * @param unknown $suffix
+ * @param unknown $categoryid
+ */
+function up_term_exists($termcode, $suffix, $categoryid)
+{
+	global $DB;
+
+	$sql = "SELECT * FROM {tool_createcourse} WHERE termcode=$termcode OR suffix='$suffix' OR categoryid=$categoryid";
+
+	if($rows = $DB->get_records_sql($sql, null, null, 1))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+/**
  * Checks to see if a course already exists in the moodle database
  *
  * @global type $CFG
@@ -374,6 +396,15 @@ function up_insert_course($course) {
 			exit ();
 		}
 
+
+		$event = \core\event\course_created::create(array(
+				'objectid' => $course->id,
+				'context' => context_course::instance($course->id),
+				'other' => array('shortname' => $course->shortname,
+						'fullname' => $course->fullname)
+		));
+		$event->trigger();
+
 		return COURSE_CREATION_SUCCEEDED;
 	} else {
 		add_to_log ( '1', 'course', 'error', '', "Creating: $shortname (BANID $courserequestnumber)", '', '4' );
@@ -386,8 +417,10 @@ function up_insert_course($course) {
  *
  * @param type $courses
  */
-function up_insert_courses() {
-	global $SESSION;
+function up_insert_courses($courses_to_insert) {
+
+	// retrieve list of courses from session
+	$courses = $courses_to_insert;
 
 	// counters for created and failed courses
 	$courses_created = 0;
@@ -397,29 +430,8 @@ function up_insert_courses() {
 	$ts_timer = new Timer ();
 	$ts_timer->start ();
 
-	// //display confirmation prompt in the case that the user has initiated the course creation
-	// if ( $_GET['go'] != 'yes' ){
-	//
-	// print '<div align="center">';
-	// print '<font color="red">Do you really want to import courses?</font><br />';
-	// print $rows . ' courses waiting to be imported<br />';
-	// print 'CONFIG INFORMATION :<br />';
-	// print "moodlepath : $moodlepath <br />";
-	// print "database : $CFG->dbname<br />";
-	// print 'debug: ' . UP_DEBUG . '<br />';
-	//
-	// print '<form action="' . $PHP_SELF . '"><br />';
-	// print '<input type="text" name="go" value="" size="4"> (enter yes to continue)<br />';
-	// print '<input type="submit" value="Go &gt;&gt;">';
-	// print '</form>';
-	// print '</div>';
-	// exit;
-	// }
-
 	$j = 0; // Start Counter //
 
-	// retrieve list of courses from session
-	$courses = $SESSION->tool_createcourse->courses;
 
 	// cycle through each of the courses and get their information
 	foreach ( $courses as $data ) {
@@ -469,6 +481,14 @@ function up_insert_courses() {
 }
 
 
+/**
+ * Adds an enrolment plugin capability to a course
+ * @param unknown $name name of the plugin
+ * @param unknown $inserted whether the course was just inserted or already exists
+ * @param unknown $course moodle course data
+ * @param unknown $data raw course information
+ * @return boolean whether the function successfully added a course or not
+ */
 function up_add_enrol_plugin($name, $inserted, $course, $data)
 {
 	global $CFG;
