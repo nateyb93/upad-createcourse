@@ -15,7 +15,6 @@ global $OUTPUT;
 require_login();
 
 require_once __DIR__ . '/createcourse_form.php';
-require_once __DIR__ . '/success_form.php';
 
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');

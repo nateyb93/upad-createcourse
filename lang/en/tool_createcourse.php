@@ -53,12 +53,6 @@ $string['importsettings_maxcourses_visiblename'] = 'Max # of courses';
 $string['importsettings_maxcourses_description'] = "Sets the maxiumum number of courses that can be imported at a time";
 $string['importsettings_maxcourses_default'] = '';
 
-//course table column names
-$string['col_termcode'] = 'Termcode';
-$string['col_suffix'] = 'Suffix';
-$string['col_categoryid'] = 'Category ID';
-$string['col_actions'] = 'Actions';
-
 //main page/new courses finding form elements
 $string['importpage_termcode'] = 'Termcode';
 $string['importpage_categoryid'] = 'Category Id';
@@ -79,4 +73,17 @@ $string['confirmationpage_submit'] = 'Submit';
 
 $string['successpage_text'] = "Success! The courses with the specified termcode have been added to Moodle's course database.";
 $string['successpage_submit'] = "Continue";
+
+
+//for viewing queries
+$string['viewqueries'] = "View queries";
+$string['viewqueries_header'] = "View term data";
+$string['viewqueries_description'] = "Allows you to view, delete, and run term data queries on the banner database";
+
+//term_data table column names
+$string['col_termcode'] = 'Termcode';
+$string['col_suffix'] = 'Suffix';
+$string['col_categoryid'] = 'Category ID';
+$string['col_hidden'] = "Hidden";
+$string['col_actions'] = 'Actions';
 
