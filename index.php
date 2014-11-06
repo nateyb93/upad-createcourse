@@ -35,7 +35,7 @@ if ($postData = $termform->get_data ()) {
 			$DB->insert_record ( 'tool_createcourse', $term_data ) or die ( "Error" );
 		}
 
-		redirect ( new moodle_url ( 'index.php?added' ) );
+		redirect ( new moodle_url ( 'index.php?start' ) );
 	}
 }
 

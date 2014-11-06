@@ -7,7 +7,7 @@ if($hassiteconfig) {
 
     $ADMIN->add('tool_createcourse',
                 new admin_externalpage('tool_createcourse_create', get_string('pluginname', 'tool_createcourse'),
-                $CFG->wwwroot.'/'.$CFG->admin.'/tool/createcourse/index.php',
+                $CFG->wwwroot.'/'.$CFG->admin.'/tool/createcourse/index.php?start',
                 'moodle/site:config'));
 
 

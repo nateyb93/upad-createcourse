@@ -16,7 +16,6 @@ require_once ("$CFG->libdir/blocklib.php");
 require_once ("$CFG->libdir/pagelib.php");
 require_once ("$CFG->libdir/enrollib.php");
 
-require_once (__DIR__ . '/timer.php');
 require_once (__DIR__ . '/upconf.inc.php');
 
 error_reporting ( E_ALL );
@@ -153,7 +152,7 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 	}
 
 	// Retrieve the term information codes fetched earlier from banner and stored in the session variable 'term_data'
-	$term_data = $SESSION->tool_createcourse->term_data;
+	$term_data = $DB->get_records_list('tool_createcourse', 'termcode', array($termcode), '', 'category_id, suffix' );
 
 	// Blow up if false
 	if (! $term_data) {
@@ -540,3 +539,27 @@ function up_add_enrol_plugin($name, $inserted, $course, $data)
 	//echo "<h1 style='font-weight:bold;font-size=32'>Enrolment plugin added!</h1>";
 	return true;
 }
+
+
+// Timer class // License: None, do whatever you want with it.
+// Allows for benchmarking page performance.
+//-------------------------------------------------------------------------
+class Timer {
+	var $startTime, $endTime, $timeDifference;
+
+	function start()  { $this->startTime = $this->currentTime(); }
+	function finish() { $this->endTime = $this->currentTime();   }
+
+	function getTime() {
+		$this->timeDifference = $this->endTime - $this->startTime;
+		return round($this->timeDifference, 5);
+	}
+
+
+	function currentTime() { list($usec, $sec) = explode(' ',microtime()); return ((float)$usec + (float)$sec); }
+
+
+}// End Timer class
+
+
+

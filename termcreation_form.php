@@ -32,60 +32,61 @@ class termcreation_form extends moodleform {
 								$this->termdata_table($term_data).
 						   "</div>");
 
-		$mform->addElement('header', 'importpage_header', get_string('importpage_header', 'tool_createcourse'));
-		$mform->addElement('html', '<span>' . get_string('importpage_description', 'tool_createcourse') . '</span>');
-
-		$this->addSpacer($mform);
-		$this->addSpacer($mform);
-
-		//add textboxes for input
-		$mform->addElement('text', 'termcode', get_string('importpage_termcode', 'tool_createcourse'));
-		$mform->setType('termcode', PARAM_NOTAGS);
-		$mform->setDefault('termcode', '');
-		$mform->addRule('termcode', null, 'required', null, 'client');
-
-		$this->addSpacer($mform);
-
-		$mform->addElement('text', 'suffix', get_string('importpage_suffix', 'tool_createcourse'));
-		$mform->setType('suffix', PARAM_NOTAGS);
-		$mform->setDefault('suffix', '');
-		$mform->addRule('suffix', null, 'required', null, 'client');
-
-		$this->addSpacer($mform);
-
-		//create multiselect for category ids; can only use a category id that already exists
-		$query = "SELECT id FROM {course_categories}";
-		$records = $DB->get_records_sql($query);
-		$options = array();
-		$options[] = '';
-		foreach($records as $record)
+		if(!isset($_GET['start']) && !isset($_GET['deletesuccess']))
 		{
-			$options[] = $record->id;
+			$mform->addElement('header', 'importpage_header', get_string('importpage_header', 'tool_createcourse'));
+			$mform->addElement('html', '<span>' . get_string('importpage_description', 'tool_createcourse') . '</span>');
+
+			$this->addSpacer($mform);
+			$this->addSpacer($mform);
+
+			//add textboxes for input
+			$mform->addElement('text', 'termcode', get_string('importpage_termcode', 'tool_createcourse'));
+			$mform->setType('termcode', PARAM_NOTAGS);
+			$mform->setDefault('termcode', '');
+			$mform->addRule('termcode', null, 'required', null, 'client');
+
+			$this->addSpacer($mform);
+
+			$mform->addElement('text', 'suffix', get_string('importpage_suffix', 'tool_createcourse'));
+			$mform->setType('suffix', PARAM_NOTAGS);
+			$mform->setDefault('suffix', '');
+			$mform->addRule('suffix', null, 'required', null, 'client');
+
+			$this->addSpacer($mform);
+
+			//create multiselect for category ids; can only use a category id that already exists
+			$query = "SELECT id FROM {course_categories}";
+			$records = $DB->get_records_sql($query);
+			$options = array();
+			$options[] = '';
+			foreach($records as $record)
+			{
+				$options[] = $record->id;
+			}
+			$mform->addElement('select', 'categoryid', get_string('importpage_categoryid', 'tool_createcourse'), $options);
+			$mform->addRule('categoryid', null, 'required', null, 'client');
+
+			$this->addSpacer($mform);
+
+			//adds a checkbox for the 'hidden' field
+			$mform->addElement('advcheckbox',
+					'hideterm',
+					get_string('importpage_hideterm', 'tool_createcourse'),
+					get_string('importpage_hideterm_info', 'tool_createcourse'),
+					/*attributes*/null,
+					/*un/checked values*/array(0,1));
+
+			//adds the submit, reset, and cancel buttons to the form
+			$submitarray = array();
+			$submitarray[] = &$mform->createElement('submit', 'submitbutton', get_string('importpage_submit', 'tool_createcourse'));
+			$submitarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'));
+			$submitarray[] = &$mform->createElement('cancel');
+			$mform->addGroup($submitarray, 'buttonarr', '', array(' '), false);
+
+
+			$mform->closeHeaderBefore('buttonarr');
 		}
-		$mform->addElement('select', 'categoryid', get_string('importpage_categoryid', 'tool_createcourse'), $options);
-		$mform->addRule('categoryid', null, 'required', null, 'client');
-
-		$this->addSpacer($mform);
-
-		//adds a checkbox for the 'hidden' field
-		$mform->addElement('advcheckbox',
-				'hideterm',
-				get_string('importpage_hideterm', 'tool_createcourse'),
-				get_string('importpage_hideterm_info', 'tool_createcourse'),
-				/*attributes*/null,
-				/*un/checked values*/array(0,1));
-
-		//adds the submit, reset, and cancel buttons to the form
-		$submitarray = array();
-		$submitarray[] = &$mform->createElement('submit', 'submitbutton', get_string('importpage_submit', 'tool_createcourse'));
-		$submitarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'));
-		$submitarray[] = &$mform->createElement('cancel');
-		$mform->addGroup($submitarray, 'buttonarr', '', array(' '), false);
-
-
-		$mform->closeHeaderBefore('buttonarr');
-
-
 
 	}
 
@@ -122,18 +123,6 @@ class termcreation_form extends moodleform {
 			$row[] = $term->categoryid;
 			$row[] = $term->hidden;
 
-			//import courses action
-			$params = array(
-				'action' => 'import',
-				'termcode' => $term->termcode,
-				'suffix' => $term->suffix,
-				'categoryid' => $term->categoryid,
-				'hidden' => $term->hidden
-			);
-			$action_url = new moodle_url("action.php", $params);
-			$action_icon = $OUTPUT->pix_icon('t/backup', new lang_string('import'));
-			$action = html_writer::link($action_url, $action_icon);
-
 			//delete record action
 			$params = array(
 				'action' => 'delete',
@@ -143,13 +132,28 @@ class termcreation_form extends moodleform {
 			$delete_icon = $OUTPUT->pix_icon('t/delete', new lang_string('delete'));
 			$delete = html_writer::link($delete_url, $delete_icon);
 
-			$actions = implode(' ', array($action, $delete));
+			$actions = implode(' ', array($delete));
 			$row[] = $actions;
 
 			//set data for table row
 			$table->data[] = $row;
 		}
 
+		if(isset($_GET['start']) || isset($_GET['deletesuccess']))
+		{
+			$row = array();
+			$row[] = '';
+			$row[] = '';
+			$row[] = '';
+			$row[] = '';
+			$add_url = new moodle_url('index.php');
+			$add_icon = $OUTPUT->pix_icon('t/add', new lang_string('add'));
+			$add = html_writer::link($add_url, $add_icon);
+			$actions = implode(' ', array($add));
+
+			$row[] = $actions;
+			$table->data[] = $row;
+		}
 
 
 		return html_writer::table($table);
