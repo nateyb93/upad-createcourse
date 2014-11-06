@@ -10,10 +10,6 @@ if($hassiteconfig) {
                 $CFG->wwwroot.'/'.$CFG->admin.'/tool/createcourse/index.php',
                 'moodle/site:config'));
 
-    $ADMIN->add('tool_createcourse',
-    			new admin_externalpage('tool_createcourse_view', get_string('viewqueries', 'tool_createcourse'),
-    			$CFG->wwwroot.'/'.$CFG->admin.'/tool/createcourse/view.php',
-    			'moodle/site:config'));
 
     //add configuration settings for external database information
     $settings = new admin_settingpage('createcourse_settings',

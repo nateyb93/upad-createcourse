@@ -1,6 +1,6 @@
 <?php
 global $SESSION;
-$string['pluginname'] = 'Import banner courses';
+$string['pluginname'] = "View terms/import courses";
 $string['header'] = 'Import courses from banner to be entered into the course database';
 
 //database information
@@ -61,8 +61,8 @@ $string['importpage_suffix'] = 'Suffix';
 
 $string['importpage_submit'] = 'Submit';
 $string['importpage_importbutton'] = 'Import Courses';
-$string['importpage_header'] = "Category information";
-$string['importpage_description'] = "Enter information here for a new category. If it isn't already in the database, it will be added.";
+$string['importpage_header'] = "Add new category";
+$string['importpage_description'] = "Enter information here for a new term. If it isn't already in the database, it will be added.";
 $string['importpage_hideterm'] = 'Hide term';
 $string['importpage_hideterm_info'] = 'Hide courses associated with the specified termcode in Moodle.';
 
@@ -76,9 +76,9 @@ $string['successpage_submit'] = "Continue";
 
 
 //for viewing queries
-$string['viewqueries'] = "View queries";
-$string['viewqueries_header'] = "View term data";
-$string['viewqueries_description'] = "Allows you to view, delete, and run term data queries on the banner database";
+$string['viewqueries'] = "View terms or Import courses";
+$string['viewqueries_header'] = "View terms/Import courses";
+$string['viewqueries_description'] = "You can add/remove term data and import courses from this form.";
 
 //term_data table column names
 $string['col_termcode'] = 'Termcode';

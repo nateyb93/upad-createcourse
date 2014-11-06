@@ -1,16 +1,6 @@
-/*.fitem.fitem_ftext{
-    color:#000000;
-    display:block;
-    float:left;
-    width:100px !important;
+.tableform {
+	width:70px !important;
+	margin-left:0px;
+	margin-right:0px;
+	visibility:hidden;
 }
-
-.fitemtitle{
-    width:auto !important;
-}
-
-.text{
-    float:left;
-    margin-left:0px;
-}*/
-

@@ -17,6 +17,7 @@ require_once ("$CFG->libdir/pagelib.php");
 require_once ("$CFG->libdir/enrollib.php");
 
 require_once (__DIR__ . '/timer.php');
+require_once (__DIR__ . '/upconf.inc.php');
 
 error_reporting ( E_ALL );
 ini_set ( 'display_errors', 'ON' );
@@ -213,7 +214,7 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 	$form->timecreated = time ();
 	$form->timemodified = $form->timecreated;
 
-	$SESSION->tool_createcourse->courses [] = $form;
+	return $form;
 } // end of function build_course //
 
 
@@ -224,9 +225,12 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
  *        	array containing course information from banner database
  */
 function up_build_courses($courses) {
+	$built_courses = array();
 	foreach ( $courses as $course ) {
-		up_build_course ( $course ['CRN'], $course ['COURSE_SHORT_NAME'], $course ['COURSE_LONG_NAME'], $course ['START_DATE'], $course ['END_DATE'], $course ['TERMCODE'] );
+		$built_courses[] = up_build_course ( $course ['CRN'], $course ['COURSE_SHORT_NAME'], $course ['COURSE_LONG_NAME'], $course ['START_DATE'], $course ['END_DATE'], $course ['TERMCODE'] );
 	}
+
+	return $built_courses;
 }
 
 /**
@@ -422,6 +426,8 @@ function up_insert_courses($courses_to_insert) {
 	// retrieve list of courses from session
 	$courses = $courses_to_insert;
 
+	!empty($courses) or die('No courses to import!');
+
 	// counters for created and failed courses
 	$courses_created = 0;
 	$courses_failed = 0;
@@ -477,7 +483,14 @@ function up_insert_courses($courses_to_insert) {
 	// end foreach( $results as $data ) //
 
 	echo '<br />action took: ' . $ts_timer->getTime () . " seconds.<br />" . "<br /> Courses created: " . $courses_created . " | Courses failed: " . $courses_failed;
-	$SESSION->tool_createcourse->courses = array ();
+}
+
+/**
+ * For writability/readability: handles all course enrolment tasks (importing, building, and inserting)
+ */
+function up_handle_course_enrolment()
+{
+	up_insert_courses(up_build_courses(up_import_courses()));
 }
 
 

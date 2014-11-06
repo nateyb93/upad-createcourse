@@ -22,17 +22,6 @@ class tool_createcourse_renderer extends plugin_renderer_base
     }
 
 
-    public function query_page(moodleform $mform){
-
-    	global $CFG;
-
-    	$output = $this->header();
-    	$output .= $this->moodleform($mform);
-    	$output .= $this->footer();
-
-    	return $output;
-    }
-
     /**
      * Use this since we can't fetch the output of a moodle form
      * @param moodleform $mform
