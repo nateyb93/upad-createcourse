@@ -101,7 +101,6 @@ function get_db_info() {
  * @return type array containing imported courses
  */
 function up_import_courses() {
-	global $SESSION;
 
 	// Connect to Banner and retrieve tables
 	$query = "SELECT VW_UPM_COURSES.CRN,VW_UPM_COURSES.TERMCODE,VW_UPM_COURSES.COURSE_LONG_NAME,VW_UPM_COURSES.COURSE_SHORT_NAME,VW_UPM_COURSES.START_DATE,VW_UPM_COURSES.END_DATE,TBL_UPM_COURSE_SYNC.CREATED FROM UP_MOODLE.VW_UPM_COURSES LEFT OUTER JOIN UP_MOODLE.TBL_UPM_COURSE_SYNC ON VW_UPM_COURSES.CRN = TBL_UPM_COURSE_SYNC.CRN WHERE TBL_UPM_COURSE_SYNC.CRN is null";
@@ -117,8 +116,6 @@ function up_import_courses() {
 
 	// get rows from table
 	$rows = oci_fetch_all ( $sql, $results, 0, $totalrows, OCI_FETCHSTATEMENT_BY_ROW );
-
-	$SESSION->tool_createcourse->num_courses = $rows;
 
 	return $results;
 }
@@ -143,7 +140,6 @@ function up_import_courses() {
  *        	course term code
  */
 function up_build_course($courserequestnumber, $shortname, $fullname, $startdate, $enddate, $termcode) {
-	global $SESSION;
 
 	$form = new stdClass ();
 
@@ -151,7 +147,7 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 		print "calling :: build_course( $courserequestnumber, $shortname, $fullname, $startdate, $termcode )<br />\n";
 	}
 
-	// Retrieve the term information codes fetched earlier from banner and stored in the session variable 'term_data'
+	// Retrieve the term information codes fetched from banner
 	$term_data = $DB->get_records_list('tool_createcourse', 'termcode', array($termcode), '', 'category_id, suffix' );
 
 	// Blow up if false
@@ -420,10 +416,7 @@ function up_insert_course($course) {
  *
  * @param type $courses
  */
-function up_insert_courses($courses_to_insert) {
-
-	// retrieve list of courses from session
-	$courses = $courses_to_insert;
+function up_insert_courses($courses) {
 
 	!empty($courses) or die('No courses to import!');
 

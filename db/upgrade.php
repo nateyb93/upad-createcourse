@@ -6,7 +6,7 @@ function xmldb_tool_createcourse_upgrade($oldversion)
     $dbman = $DB->get_manager();
 
 
-    if($oldversion < 2014110502) {
+    if($oldversion < 2014110701) {
         $table = new xmldb_table('tool_createcourse');
 
         //Adding fields to table
@@ -34,7 +34,7 @@ function xmldb_tool_createcourse_upgrade($oldversion)
         	$dbman->create_table($table);
         }
 
-        upgrade_plugin_savepoint(true, 2014110502, 'tool', 'createcourse');
+        upgrade_plugin_savepoint(true, 2014110701, 'tool', 'createcourse');
     }
 
     return true;
