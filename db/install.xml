@@ -10,7 +10,7 @@
         <FIELD NAME="termcode" TYPE="int" LENGTH="6" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="suffix" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="categoryid" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="hidden" TYPE="binary" NOTNULL="true" SEQUENCE="false" COMMENT="hides the specified termcode/category"></FIELD>
+        <FIELD NAME="hidden" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="hides the specified termcode/category"></FIELD>
       </FIELDS>
       <KEYS>
         <KEY NAME="id" TYPE="primary" FIELDS="id"/>

@@ -6,7 +6,7 @@ function xmldb_tool_createcourse_upgrade($oldversion)
     $dbman = $DB->get_manager();
 
 
-    if($oldversion < 2014110701) {
+    if($oldversion < 2014111000) {
         $table = new xmldb_table('tool_createcourse');
 
         //Adding fields to table
@@ -15,7 +15,7 @@ function xmldb_tool_createcourse_upgrade($oldversion)
         $table->add_field('suffix', XMLDB_TYPE_CHAR, '4', null, XMLDB_NOTNULL, null, null);
         $table->add_field('categoryid', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null);
 
-        $hidden = new xmldb_field('hidden', XMLDB_TYPE_BINARY, null, null, XMLDB_NOTNULL, null, null, 'categoryid');
+        $hidden = new xmldb_field('hidden', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, 'categoryid');
 
         if (!$dbman->field_exists($table, $hidden)) {
         	$dbman->add_field($table, $hidden);
@@ -34,7 +34,7 @@ function xmldb_tool_createcourse_upgrade($oldversion)
         	$dbman->create_table($table);
         }
 
-        upgrade_plugin_savepoint(true, 2014110701, 'tool', 'createcourse');
+        upgrade_plugin_savepoint(true, 2014111000, 'tool', 'createcourse');
     }
 
     return true;
