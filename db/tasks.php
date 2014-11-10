@@ -4,10 +4,10 @@ $tasks = array(
 	array(
 		'classname' => 'tool_createcourse\task\banner_enrol',
 		'blocking' => 0,
-		'minute' => '1',
-		'hour' => '0',
+		'minute' => '*',
+		'hour' => '2',
 		'day' => '*',
-		'dayofweek' => '0',
-		'month' => '1,7'
+		'dayofweek' => '*',
+		'month' => '*'
 	)
 );
