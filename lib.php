@@ -140,6 +140,7 @@ function up_import_courses() {
  *        	course term code
  */
 function up_build_course($courserequestnumber, $shortname, $fullname, $startdate, $enddate, $termcode) {
+	global $DB;
 
 	$form = new stdClass ();
 
