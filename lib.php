@@ -309,8 +309,14 @@ function up_insert_category($categoryid, $description = null)
 	$record->idnumber = $categoryid;
 	$record->description = $description;
 
+	try{
+		$DB->insert_record('course_categories', $record, false);
+	}
+	catch(coding_exception $e)
+	{
+		print $e->getMessage();
+	}
 
-	$DB->insert_record('course_categories', $record, false);
 }
 
 /**
@@ -326,7 +332,15 @@ function up_insert_course($course) {
 
 
 	$dbinfo = get_db_info();
-	$oc = oci_connect($dbinfo->username, $dbinfo->password, $dbinfo->db);
+	$oc = new stdClass();
+
+	try{
+		$oc = oci_connect($dbinfo->username, $dbinfo->password, $dbinfo->db);
+	}
+	catch(exception $e){
+		print $e->getMessage();
+	}
+
 
 	// Check if the course exists
 	if (up_course_exists ( $courserequestnumber, $category )) {
@@ -374,7 +388,15 @@ function up_insert_course($course) {
 		$section->course = $newcourseid; // Create a default section.
 		$section->section = 0;
 		$section->summaryformat = FORMAT_HTML;
-		$DB->insert_record ( 'course_sections', $section );
+
+		try{
+			$DB->insert_record ( 'course_sections', $section );
+		}
+		catch(coding_exception $e)
+		{
+			print $e->getMessage();
+		}
+
 
 		fix_course_sortorder ();
 
