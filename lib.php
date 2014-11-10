@@ -149,7 +149,9 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 	}
 
 	// Retrieve the term information codes fetched from banner
-	$term_data = $DB->get_records_list('tool_createcourse', 'termcode', array($termcode), '', 'category_id, suffix' );
+
+	$sql = "SELECT termcode, suffix, categoryid, hidden FROM {tool_createcourse} WHERE termcode=$termcode";
+	$term_data = $DB->get_records_sql($sql);
 
 	// Blow up if false
 	if (! $term_data) {
@@ -161,6 +163,7 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 	// Set the suffix and category
 	$course_sn_postfix = $term_data->suffix;
 	$form->category = $term_data->categoryid;
+	$form->visible = !$term_data->hidden;
 
 	if (UP_DEBUG) {
 		print 'SUFFIX:' . $term_data->suffix . '<br/>';
@@ -173,6 +176,7 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 	$form->fullname = $form->shortname . ' - ' . $fullname;
 	$form->summary = "Welcome to $fullname.";
 	$form->termcode = $termcode;
+
 
 	// Reformat the date. It is returned in the format 29-AUG-05 from banner
 	$form->startdate = strtotime ( $startdate );
@@ -209,6 +213,7 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 	$form->enrollable = 0;
 	$form->timecreated = time ();
 	$form->timemodified = $form->timecreated;
+
 
 	return $form;
 } // end of function build_course //
