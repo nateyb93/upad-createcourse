@@ -154,16 +154,16 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 	$term_data = $DB->get_records_sql($sql);
 
 	// Blow up if false
-	if (! $term_data) {
+	if ($term_data == false) {
 		print 'FAIL<br/>';
-		print 'No term code category has been set in the database.';
-		exit ();
+		print "Termcode $termcode hasn't been set in the database.";
+		return;
 	}
 
 	// Set the suffix and category
-	$course_sn_postfix = $term_data->suffix;
-	$form->category = $term_data->categoryid;
-	$form->visible = !$term_data->hidden;
+	$course_sn_postfix = $term_data["suffix"]->value;
+	$form->category = $term_data["categoryid"]->value;
+	$form->visible = !$term_data["hidden"]->value;
 
 	if (UP_DEBUG) {
 		print 'SUFFIX:' . $term_data->suffix . '<br/>';
@@ -228,6 +228,10 @@ function up_build_course($courserequestnumber, $shortname, $fullname, $startdate
 function up_build_courses($courses) {
 	$built_courses = array();
 	foreach ( $courses as $course ) {
+		if(!isset($course->termcode) || !isset($course->suffix) || !isset($course->categoryid))
+		{
+			continue;
+		}
 		$built_courses[] = up_build_course ( $course ['CRN'], $course ['COURSE_SHORT_NAME'], $course ['COURSE_LONG_NAME'], $course ['START_DATE'], $course ['END_DATE'], $course ['TERMCODE'] );
 	}
 
@@ -333,6 +337,8 @@ function up_insert_category($categoryid, $description = null)
  */
 function up_insert_course($course) {
 	global $DB;
+
+
 	$courserequestnumber = $course->idnumber;
 	$category = $course->category;
 
